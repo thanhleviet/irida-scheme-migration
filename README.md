@@ -1,5 +1,5 @@
 ## What?
-Upgrading IRIDA version by version is a straightforward process. However, if you happen to have a rather old version, let's say 19.09, and you now wish to upgrade to 23.10, it can become quite tedious to follow these steps: stop Tomcat, replace the WAR file, start Tomcat, and wait for IRIDA to execute the database schema update. Alternatively, if you prefer to avoid this lengthy process, you can directly migrate the database schema between two significantly different versions by simply running a few SQL files. This straightforward script will assist you in accomplishing this task.
+Upgrading [IRIDA](https://irida.ca/) version by version is a straightforward process. However, if you happen to have a rather old version, let's say 19.09, and you now wish to upgrade to 23.10, it can become quite tedious to follow these steps: stop Tomcat, replace the WAR file, start Tomcat, and wait for IRIDA to execute the database schema update. Alternatively, if you prefer to avoid this lengthy process, you can directly migrate the database schema between two significantly different versions by simply running a few SQL files. This straightforward script will assist you in accomplishing this task.
 
 ## Requirements
 
