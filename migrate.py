@@ -5,6 +5,7 @@ import argparse
 import subprocess
 import re
 import time
+
 # Function to print all existing MySQL databases
 def list_mysql_databases(host, user, password):
     try:
@@ -70,25 +71,27 @@ def create_mysql_database(host, user, password, db_name, drop_existing):
         if conn:
             conn.close()
 
-def execute_mysql_restore(sql_file, docker_container, db_name, user, password):
+def execute_mysql_restore(sql_file, host, db_name, user, password):
     # Compose the command
-    command = [
-        "docker", "exec", docker_container,
-        "sh", "-c",
-        f'gunzip -c {sql_file} | mysql -u{user} -p{password} {db_name}'
-    ]
-
+    command = f'gunzip -c {sql_file} | mysql -h{host} -u{user} -p{password} {db_name}'
     try:
         # Execute the command
-        subprocess.run(command, check=True)
+        subprocess.run(command, shell=True, check=True)
         print(f"Restored SQL file {sql_file} to database {db_name} successfully!")
 
     except subprocess.CalledProcessError as e:
         print(f"Error: {e}")
 
-# Function to run SQL files from a folder on the specified database
+
 # Function to run SQL files listed in a text file on the specified database
 def run_sql_files_from_list(host, user, password, db_name, sql_list_file):
+    def run_mysql(host, user, password, sql_file):
+        command = f"mysql -h{host} -u{user} -p{password} {db_name} < {sql_file}"
+        try:
+            subprocess.run(command, shell=True, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error: {e}")
+        
     try:
         # Get the directory path of the sql_list_file
         sql_list_dir = os.path.dirname(sql_list_file)
@@ -100,18 +103,8 @@ def run_sql_files_from_list(host, user, password, db_name, sql_list_file):
             print(f"No SQL files found in the list file: {sql_list_file}")
             return
 
-
-
         # Iterate through the SQL files and execute them
         for sql_file_name in sql_files:
-                    # Connect to the MySQL database
-            conn = mysql.connector.connect(
-                host=host,
-                user=user,
-                password=password,
-                database=db_name
-            )
-            cursor = conn.cursor()
             sql_file_path = os.path.join(sql_list_dir,sql_file_name)
             if not os.path.isfile(sql_file_path):
                 print(f"SQL file not found: {sql_file_path}")
@@ -120,18 +113,18 @@ def run_sql_files_from_list(host, user, password, db_name, sql_list_file):
             with open(sql_file_path, "r") as sql_file_content:
                 print(f"Executing file: {sql_file_path}")
                 sql_script = sql_file_content.read()
-
                 # Replace "irida" with the new database name
                 sql_script = re.sub(r'\birida\b', db_name, sql_script, flags=re.IGNORECASE)
-                print(sql_script)
-                cursor.execute(sql_script)
+                sql_tmp = "sql.tmp"
+                with open(sql_tmp, "w") as sql_file:
+                    sql_file.writelines(sql_script)
+                
+                # Execute migration
+                run_mysql(host, user, password, sql_tmp)
+                os.remove(sql_tmp)
+
                 print(f"Executed SQL file: {sql_file_path}")
                 # Consume and close the cursor to avoid "Commands out of sync" error
-            # print(f"Autocommit: {conn.autocommit}")
-            cursor.fetchall()
-            cursor.close()
-            # conn.commit()
-            conn.close()
             
     except mysql.connector.Error as err:
         print(f"Error: {err}")
@@ -158,7 +151,6 @@ def main():
     host = os.getenv("MYSQL_HOST")
     user = os.getenv("MYSQL_USER")
     password = os.getenv("MYSQL_PASSWORD")
-    docker_container = os.getenv("DOCKER_CONTAINER")
     
     # Call the function to list existing databases
     list_mysql_databases(host, user, password)
@@ -168,7 +160,7 @@ def main():
     
     if (args.sql_file is not None):
         start_time = time.time()  # Record the start time
-        execute_mysql_restore(args.sql_file, docker_container, args.db, user, password)
+        execute_mysql_restore(args.sql_file, host, args.db, user, password)
         end_time = time.time()
         elapsed_time = end_time - start_time
         elapsed_time_minutes = elapsed_time / 60.0
