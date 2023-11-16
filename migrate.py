@@ -128,12 +128,6 @@ def run_sql_files_from_list(host, user, password, db_name, sql_list_file):
             
     except mysql.connector.Error as err:
         print(f"Error: {err}")
-
-    # finally:
-    #     if cursor:
-    #         cursor.close()
-    #     if conn:
-    #         conn.close()
      
 def main():
     # Load environment variables from .env file
