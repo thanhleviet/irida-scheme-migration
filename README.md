@@ -20,7 +20,6 @@ MYSQL_PASSWORD=p4ssw0rd!
 ```
 
 ```
-python mirage.py --help
 usage: migrate.py [-h] --db DB [--sql_file SQL_FILE] [--drop] [--sql_list_file SQL_LIST_FILE]
 
 Migrate IRIDA database
@@ -28,8 +27,8 @@ Migrate IRIDA database
 optional arguments:
   -h, --help            show this help message and exit
   --db DB               Name of the database to create
-  --sql_file SQL_FILE   SQL file to be restored
+  --sql_file SQL_FILE   IRIDA SQL file to be restored
   --drop                Drop the existing database before creating
   --sql_list_file SQL_LIST_FILE
-                        Path to the text file containing a list of SQL files
+                        Path to the text file containing a list of SQL files for migration, see sql folder
 ```

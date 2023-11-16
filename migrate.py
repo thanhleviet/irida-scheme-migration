@@ -136,9 +136,9 @@ def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Migrate IRIDA database")
     parser.add_argument("--db", required=True, help="Name of the database to create")
-    parser.add_argument("--sql_file", required=False, help="SQL file to be restored")
+    parser.add_argument("--sql_file", required=False, help="IRIDA SQL file to be restored")
     parser.add_argument("--drop", action="store_true", help="Drop the existing database before creating")
-    parser.add_argument("--sql_list_file", required=False, help="Path to the text file containing a list of SQL files")
+    parser.add_argument("--sql_list_file", required=False, help="Path to the text file containing a list of SQL files for migration, see sql folder")
     args = parser.parse_args()
 
     # Get MySQL credentials from environment variables loaded via dotenv
