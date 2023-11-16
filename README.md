@@ -6,10 +6,19 @@ Upgrading [IRIDA](https://irida.ca/) version by version is a straightforward pro
 See `requirements.txt` for python and the below
 
 ```
+# This command is for Centos/Rocky/Almalinux
 sudo dnf install mysql mysql-common
 ```
 
 ## Usage
+Prepare a `.env` file at the same location of `migrate.py`
+
+```
+MYSQL_HOST=127.0.0.1
+MYSQL_USER=root
+MYSQL_PASSWORD=p4ssw0rd!
+```
+
 ```
 python mirage.py --help
 usage: migrate.py [-h] --db DB [--sql_file SQL_FILE] [--drop] [--sql_list_file SQL_LIST_FILE]
